@@ -1,0 +1,45 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Publish & Test SftpCanary
+        shell: pwsh
+        run: |
+          dotnet publish .\SftpCanary.csproj `
+            -c Release `
+            -r win-x64 `
+            -o .\publish\win-x64 `
+            -p:SelfContained=true `
+            -p:PublishSingleFile=true
+
+          .\publish\win-x64\SftpCanary.exe --uri=test.rebex.net --user=demo --pass=password
+
+          $exitCode = $LASTEXITCODE
+          Write-Host "SftpCanary exit code: $exitCode"
+
+          if ($exitCode -ne 0) {
+            Write-Host "SFTP canary FAILED with code $exitCode"
+            exit $exitCode
+          }

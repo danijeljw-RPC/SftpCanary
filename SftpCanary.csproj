@@ -54,9 +54,8 @@
   </ItemGroup> 
 
   <ItemGroup>
-    <None Update="SftpCanary.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Remove="SftpCanary.ico" />
+    <Content Remove="SftpCanary.ico" />
     <None Remove="test-sftp.ps1" />
     <Content Remove="test-sftp.ps1" />
   </ItemGroup>
